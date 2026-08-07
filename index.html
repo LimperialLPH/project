@@ -102,16 +102,17 @@
       <input type="number" id="siteStatus" min="0" max="100" placeholder="ឧទាហរណ៍៖ 50">
     </div>
 
-    <!-- Customer Type Section -->
+    <!-- Stage Section -->
     <div class="form-group">
-      <label for="customerType">ប្រភេទអតិថិជន (Customer Type)</label>
-      <select id="customerType">
-        <option value="">-- ជ្រើសរើសប្រភេទអតិថិជន --</option>
-        <option value="Owner">ម្ចាស់គម្រោង (Owner)</option>
-        <option value="Contractor">អ្នកម៉ៅការ (Contractor)</option>
-        <option value="Architect/Designer">ស្ថាបត្យករ/អ្នកឌីហ្សាញ (Architect/Designer)</option>
-        <option value="Sub-contractor">អ្នកម៉ៅការបន្ត (Sub-contractor)</option>
-        <option value="Other">ផ្សេងៗ (Other)</option>
+      <label for="stage">ដំណាក់កាល (Stage)</label>
+      <select id="stage">
+        <option value="">-- ជ្រើសរើសដំណាក់កាល (Select Stage) --</option>
+        <option value="Draft">Draft</option>
+        <option value="Contacting">Contacting</option>
+        <option value="Potential">Potential</option>
+        <option value="Close Deal">Close Deal</option>
+        <option value="Waiting Decision">Waiting Decision</option>
+        <option value="Other">Other</option>
       </select>
     </div>
 
@@ -137,7 +138,7 @@
 
 <script>
   // Replace with your Google Apps Script Web App URL
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFPXF6XkEpXelVb5jRpcS4Jt06isVSPktw4uV7t-P7PyZX6kxVH05SniHf4ygkD_yk/exec"; 
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWk5bE0EBImq36EIfPhsAoQRT-W2pNXmuSElBK-M259nPxFzbC_sN54OGYt9p9bVUV/exec"; 
   let projectList = [];
   let selectedFile = null;
 
@@ -204,7 +205,7 @@
     document.getElementById('dropdownList').style.display = 'none';
 
     document.getElementById('siteStatus').value = '';
-    document.getElementById('customerType').value = '';
+    document.getElementById('stage').value = '';
     document.getElementById('remark').value = '';
     resetPhotoInputs();
 
@@ -312,7 +313,7 @@
       salePerson: document.getElementById('salePerson').value,
       checkInMap: document.getElementById('checkInMap').value,
       siteStatus: document.getElementById('siteStatus').value,
-      customerType: document.getElementById('customerType').value,
+      stage: document.getElementById('stage').value,
       remark: document.getElementById('remark').value,
       imageData: null
     };
