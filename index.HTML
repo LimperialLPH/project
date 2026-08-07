@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ប្រព័ន្ធកត់ត្រាទិន្នន័យគម្រោង</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; font-family: 'Kantumruy Pro', sans-serif; }
+    body { background-color: #f4f7f6; margin: 0; padding: 15px; display: flex; justify-content: center; }
+    .container { background: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 480px; }
+    h2 { text-align: center; color: #1a5276; margin-bottom: 20px; font-size: 20px; }
+    .form-group { margin-bottom: 15px; position: relative; }
+    label { display: block; margin-bottom: 6px; font-weight: 600; color: #2c3e50; font-size: 14px; }
+    input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; outline: none; }
+    input:focus, select:focus, textarea:focus { border-color: #3498db; }
+
+    /* Custom Searchable Dropdown List */
+    .dropdown-container { position: relative; }
+    .dropdown-list { 
+      position: absolute; top: 100%; left: 0; right: 0; 
+      background: white; border: 1px solid #3498db; border-radius: 8px; 
+      max-height: 200px; overflow-y: auto; z-index: 1000; 
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15); display: none; 
+    }
+    .dropdown-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 14px; }
+    .dropdown-item:hover, .dropdown-item.active { background-color: #ebf5fb; font-weight: 600; color: #2980b9; }
+    .dropdown-item:last-child { border-bottom: none; }
+
+    /* Single Custom Upload Button */
+    .photo-btn {
+      display: block; width: 100%; padding: 12px; border-radius: 8px; border: 1px dashed #3498db;
+      background: #ebf5fb; text-align: center; cursor: pointer; font-size: 14px;
+      font-weight: 600; color: #2980b9; transition: 0.2s; margin-top: 6px;
+    }
+    .photo-btn input { display: none; }
+
+    .btn-submit { width: 100%; padding: 12px; background-color: #27ae60; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+    .btn-submit:disabled { background-color: #bdc3c7; }
+    .btn-location { background-color: #2980b9; color: white; border: none; padding: 10px; border-radius: 8px; font-size: 13px; cursor: pointer; margin-top: 6px; width: 100%; font-weight: 600; }
+    #loading { text-align: center; font-size: 14px; color: #3498db; display: none; margin-bottom: 10px; }
+    .preview-text { font-size: 12px; color: #27ae60; margin-top: 6px; font-weight: 600; display: none; text-align: center; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>ប្រព័ន្ធកត់ត្រាទិន្នន័យគម្រោង</h2>
+  
+  <div id="loading">កំពុងទាញយកទិន្នន័យ...</div>
+
+  <form id="sourcingForm">
+    <!-- Searchable Persistent Dropdown -->
+    <div class="form-group">
+      <label for="projectSearch">ជ្រើសរើស ឬស្វែងរកគម្រោង (Select / Search Project)</label>
+      <div class="dropdown-container">
+        <input type="text" id="projectSearch" placeholder="ចុចទីនេះដើម្បីជ្រើសរើស ឬវាយស្វែងរក..." onfocus="showDropdown()" oninput="filterDropdown()">
+        <div id="dropdownList" class="dropdown-list"></div>
+      </div>
+    </div>
+
+    <!-- Project Name -->
+    <div class="form-group">
+      <label for="projectName">ឈ្មោះគម្រោង (Project Name) *</label>
+      <input type="text" id="projectName" required placeholder="បញ្ចូលឈ្មោះគម្រោង">
+    </div>
+
+    <!-- Address / Area -->
+    <div class="form-group">
+      <label for="address">អាសយដ្ឋាន/ខណ្ឌ/តំបន់ (Address / District / Area)</label>
+      <input type="text" id="address" placeholder="ឧទាហរណ៍៖ ខណ្ឌទួលគោក, ភ្នំពេញ">
+    </div>
+
+    <!-- Contact Person -->
+    <div class="form-group">
+      <label for="contactPerson">អ្នកទាក់ទង (Contact Person)</label>
+      <input type="text" id="contactPerson" placeholder="បញ្ចូលឈ្មោះអ្នកទាក់ទង">
+    </div>
+
+    <!-- Contact Number -->
+    <div class="form-group">
+      <label for="contact">លេខទូរស័ព្ទ (Contact)</label>
+      <input type="text" id="contact" placeholder="បញ្ចូលលេខទូរស័ព្ទ">
+    </div>
+
+    <!-- Sale Person -->
+    <div class="form-group">
+      <label for="salePerson">អ្នកលក់ (Sale Person)</label>
+      <input type="text" id="salePerson" placeholder="បញ្ចូលឈ្មោះអ្នកលក់">
+    </div>
+
+    <!-- Check-in Map Link -->
+    <div class="form-group">
+      <label for="checkInMap">តំណភ្ជាប់ទីតាំង (Check in Map Link)</label>
+      <input type="url" id="checkInMap" placeholder="https://maps.google.com/...">
+      <button type="button" id="locBtn" class="btn-location" onclick="getGPSLocation()">📍 ស្វែងរកទីតាំងបច្ចុប្បន្ន (Get Current Location)</button>
+    </div>
+
+    <!-- Site Status % -->
+    <div class="form-group">
+      <label for="siteStatus">ស្ថានភាពការដ្ឋាន (%) (Site Status %)</label>
+      <input type="number" id="siteStatus" min="0" max="100" placeholder="ឧទាហរណ៍៖ 50">
+    </div>
+
+    <!-- Remark -->
+    <div class="form-group">
+      <label for="remark">ចំណាំ (Remark)</label>
+      <textarea id="remark" rows="3" placeholder="ព័ត៌មានបន្ថែម..."></textarea>
+    </div>
+
+    <!-- Single Photo Upload Option -->
+    <div class="form-group">
+      <label>រូបថតការដ្ឋាន (Site Picture)</label>
+      <label class="photo-btn">
+        📁 ជ្រើសរើសរូបថត ឬថតរូប (Upload Photo / Take Picture)
+        <input type="file" id="fileUpload" accept="image/*" onchange="handleFileSelected()">
+      </label>
+      <div id="photoPreview" class="preview-text">✓ រូបថតត្រូវបានជ្រើសរើស (Photo Selected)</div>
+    </div>
+
+    <button type="submit" id="submitBtn" class="btn-submit">រក្សាទុកទិន្នន័យ (Submit)</button>
+  </form>
+</div>
+
+<script>
+  // Replace with your Google Apps Script Web App URL
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzKxpA_MHN0Ig0r0aZSc-Z5HnYBP6E8E7BsE-1OGwABhnPaQRpbAQGAePXuLBMtBrE/exec"; 
+  let projectList = [];
+  let selectedFile = null;
+
+  window.onload = function() {
+    fetchProjects();
+  };
+
+  // Close dropdown menu when tapping outside
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.dropdown-container')) {
+      document.getElementById('dropdownList').style.display = 'none';
+    }
+  });
+
+  function fetchProjects() {
+    document.getElementById('loading').style.display = 'block';
+    fetch(SCRIPT_URL)
+      .then(res => res.json())
+      .then(data => {
+        projectList = data.projects || [];
+        renderDropdown(projectList);
+        document.getElementById('loading').style.display = 'none';
+      })
+      .catch(err => {
+        console.error(err);
+        document.getElementById('loading').style.display = 'none';
+      });
+  }
+
+  function renderDropdown(items) {
+    const listContainer = document.getElementById('dropdownList');
+    listContainer.innerHTML = '';
+
+    const newOpt = document.createElement('div');
+    newOpt.className = 'dropdown-item active';
+    newOpt.textContent = '+ បញ្ចូលគម្រោងថ្មី (New Project)';
+    newOpt.onclick = function() { selectProject('NEW'); };
+    listContainer.appendChild(newOpt);
+
+    items.forEach(p => {
+      const item = document.createElement('div');
+      item.className = 'dropdown-item';
+      item.textContent = p.projectName;
+      item.onclick = function() { selectProject(p.projectName); };
+      listContainer.appendChild(item);
+    });
+  }
+
+  function showDropdown() {
+    document.getElementById('dropdownList').style.display = 'block';
+  }
+
+  function filterDropdown() {
+    showDropdown();
+    const query = document.getElementById('projectSearch').value.toLowerCase().trim();
+    const filtered = projectList.filter(p => p.projectName.toLowerCase().includes(query));
+    renderDropdown(filtered);
+
+    // Sync typed value to Project Name field
+    document.getElementById('projectName').value = document.getElementById('projectSearch').value;
+  }
+
+  function selectProject(projectName) {
+    document.getElementById('dropdownList').style.display = 'none';
+
+    document.getElementById('siteStatus').value = '';
+    document.getElementById('remark').value = '';
+    resetPhotoInputs();
+
+    if (projectName === "NEW") {
+      document.getElementById('projectSearch').value = '';
+      document.getElementById('projectName').value = '';
+      document.getElementById('address').value = '';
+      document.getElementById('contactPerson').value = '';
+      document.getElementById('contact').value = '';
+      document.getElementById('salePerson').value = '';
+      document.getElementById('checkInMap').value = '';
+    } else {
+      const selected = projectList.find(p => p.projectName === projectName);
+      if (selected) {
+        document.getElementById('projectSearch').value = selected.projectName;
+        document.getElementById('projectName').value = selected.projectName;
+        document.getElementById('address').value = selected.address;
+        document.getElementById('contactPerson').value = selected.contactPerson;
+        document.getElementById('contact').value = selected.contact;
+        document.getElementById('salePerson').value = selected.salePerson;
+        document.getElementById('checkInMap').value = selected.checkInMap;
+      }
+    }
+  }
+
+  function handleFileSelected() {
+    const fileInput = document.getElementById('fileUpload');
+    const preview = document.getElementById('photoPreview');
+
+    if (fileInput.files.length > 0) {
+      selectedFile = fileInput.files[0];
+      preview.style.display = 'block';
+    }
+  }
+
+  function resetPhotoInputs() {
+    document.getElementById('fileUpload').value = '';
+    document.getElementById('photoPreview').style.display = 'none';
+    selectedFile = null;
+  }
+
+  // Enhanced GPS Location Handler
+  function getGPSLocation() {
+    const btn = document.getElementById('locBtn');
+    
+    if (!navigator.geolocation) {
+      alert("កម្មវិធីរុករកនេះមិនគាំទ្រការទាញយកទីតាំងឡើយ (Geolocation not supported)");
+      return;
+    }
+
+    btn.textContent = "កំពុងទាញយកទីតាំង... (Getting Location...)";
+    btn.disabled = true;
+
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    };
+
+    navigator.geolocation.getCurrentPosition(
+      function(position) {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        const mapUrl = `https://maps.google.com/?q=${lat},${lng}`;
+        document.getElementById('checkInMap').value = mapUrl;
+        
+        btn.textContent = "📍 ស្វែងរកទីតាំងបច្ចុប្បន្ន (Get Current Location)";
+        btn.disabled = false;
+        alert("ទទួលបានទីតាំងជោគជ័យ! (Location captured successfully!)");
+      }, 
+      function(error) {
+        btn.textContent = "📍 ស្វែងរកទីតាំងបច្ចុប្បន្ន (Get Current Location)";
+        btn.disabled = false;
+        
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            alert("សូមបើកសិទ្ធិចូលប្រើទីតាំង (Location Permission) លើកម្មវិធីរុករក ឬទូរស័ព្ទរបស់អ្នក។");
+            break;
+          case error.POSITION_UNAVAILABLE:
+            alert("មិនអាចស្វែងរកទីតាំងបច្ចុប្បន្នបានទេ (Position unavailable)");
+            break;
+          case error.TIMEOUT:
+            alert("ការទាញយកទីតាំងចំណាយពេលយូរពេក សូមសាកល្បងម្តងទៀត (Location request timed out)");
+            break;
+          default:
+            alert("មានបញ្ហាក្នុងការទាញយកទីតាំង (An unknown error occurred)");
+            break;
+        }
+      },
+      options
+    );
+  }
+
+  document.getElementById('sourcingForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = "កំពុងរក្សាទុក... (Saving...)";
+
+    const payload = {
+      projectName: document.getElementById('projectName').value,
+      address: document.getElementById('address').value,
+      contactPerson: document.getElementById('contactPerson').value,
+      contact: document.getElementById('contact').value,
+      salePerson: document.getElementById('salePerson').value,
+      checkInMap: document.getElementById('checkInMap').value,
+      siteStatus: document.getElementById('siteStatus').value,
+      remark: document.getElementById('remark').value,
+      imageData: null
+    };
+
+    if (selectedFile) {
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        payload.imageData = evt.target.result;
+        sendData(payload);
+      };
+      reader.readAsDataURL(selectedFile);
+    } else {
+      sendData(payload);
+    }
+  });
+
+  function sendData(payload) {
+    fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(res => {
+      alert("ទិន្នន័យត្រូវបានរក្សាទុកដោយជោគជ័យ! (Data saved successfully!)");
+      document.getElementById('sourcingForm').reset();
+      resetPhotoInputs();
+      fetchProjects();
+    })
+    .catch(err => {
+      alert("មានបញ្ហាក្នុងការរក្សាទុកទិន្នន័យ! (Error saving data!)");
+      console.error(err);
+    })
+    .finally(() => {
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = false;
+      btn.textContent = "រក្សាទុកទិន្នន័យ (Submit)";
+    });
+  }
+</script>
+
+</body>
+</html>
