@@ -102,6 +102,19 @@
       <input type="number" id="siteStatus" min="0" max="100" placeholder="ឧទាហរណ៍៖ 50">
     </div>
 
+    <!-- Customer Type Section -->
+    <div class="form-group">
+      <label for="customerType">ប្រភេទអតិថិជន (Customer Type)</label>
+      <select id="customerType">
+        <option value="">-- ជ្រើសរើសប្រភេទអតិថិជន --</option>
+        <option value="Owner">ម្ចាស់គម្រោង (Owner)</option>
+        <option value="Contractor">អ្នកម៉ៅការ (Contractor)</option>
+        <option value="Architect/Designer">ស្ថាបត្យករ/អ្នកឌីហ្សាញ (Architect/Designer)</option>
+        <option value="Sub-contractor">អ្នកម៉ៅការបន្ត (Sub-contractor)</option>
+        <option value="Other">ផ្សេងៗ (Other)</option>
+      </select>
+    </div>
+
     <!-- Remark -->
     <div class="form-group">
       <label for="remark">ចំណាំ (Remark)</label>
@@ -124,7 +137,7 @@
 
 <script>
   // Replace with your Google Apps Script Web App URL
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzKxpA_MHN0Ig0r0aZSc-Z5HnYBP6E8E7BsE-1OGwABhnPaQRpbAQGAePXuLBMtBrE/exec"; 
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFPXF6XkEpXelVb5jRpcS4Jt06isVSPktw4uV7t-P7PyZX6kxVH05SniHf4ygkD_yk/exec"; 
   let projectList = [];
   let selectedFile = null;
 
@@ -191,6 +204,7 @@
     document.getElementById('dropdownList').style.display = 'none';
 
     document.getElementById('siteStatus').value = '';
+    document.getElementById('customerType').value = '';
     document.getElementById('remark').value = '';
     resetPhotoInputs();
 
@@ -298,6 +312,7 @@
       salePerson: document.getElementById('salePerson').value,
       checkInMap: document.getElementById('checkInMap').value,
       siteStatus: document.getElementById('siteStatus').value,
+      customerType: document.getElementById('customerType').value,
       remark: document.getElementById('remark').value,
       imageData: null
     };
