@@ -17,6 +17,9 @@
 
     h2 { text-align: center; color: #1a5276; margin-bottom: 20px; font-size: 20px; }
     .form-group { margin-bottom: 15px; position: relative; }
+    .search-filter-row { display: flex; gap: 8px; margin-bottom: 15px; }
+    .search-filter-row input { flex: 1.4; width: auto; }
+    .search-filter-row select { flex: 1; width: auto; }
     label { display: block; margin-bottom: 6px; font-weight: 600; color: #2c3e50; font-size: 14px; }
     input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; outline: none; }
     input:focus, select:focus, textarea:focus { border-color: #3498db; }
@@ -185,8 +188,11 @@
   <!-- PLATFORM 2: Existing Sites List View -->
   <div id="existingContainer" style="display: none;">
     <h2>ការដ្ឋានមានស្រាប់</h2>
-    <div class="form-group">
+    <div class="search-filter-row">
       <input type="text" id="searchExisting" placeholder="🔍 វាយស្វែងរកឈ្មោះ ឬលេខ No..." oninput="filterExistingSites()">
+      <select id="filterArea" onchange="filterExistingSites()">
+        <option value="">គ្រប់តំបន់ (All Areas)</option>
+      </select>
     </div>
     <div id="loadingText" style="text-align: center; color: #3498db; margin: 15px 0;">កំពុងទាញយកទិន្នន័យ...</div>
     <div id="existingList"></div>
@@ -257,6 +263,24 @@
     return Math.round(num);
   }
 
+  function formatVisitDateOnly(visitTime) {
+    if (!visitTime) return '';
+    // en-GB toLocaleString format: "DD/MM/YYYY, HH:MM:SS" -> take the date part before the comma
+    if (visitTime.includes(',')) {
+      return visitTime.split(',')[0].trim();
+    }
+    // ISO datetime format: "YYYY-MM-DDTHH:MM:SS.sssZ" -> take the date part before the "T"
+    if (visitTime.includes('T')) {
+      return visitTime.split('T')[0];
+    }
+    // Fallback: try parsing as a Date object
+    const d = new Date(visitTime);
+    if (!isNaN(d.getTime())) {
+      return d.toLocaleDateString('en-GB', { timeZone: 'Asia/Phnom_Penh' });
+    }
+    return visitTime;
+  }
+
   function formatGoogleDriveUrl(url) {
     if (!url) return '';
     // If it's already a thumbnail format or non-drive link, return it directly
@@ -278,6 +302,7 @@
       .then(data => {
         rawSheetData = data.projects || [];
         processAndGroupData(rawSheetData);
+        populateAreaFilter();
         renderExistingList();
         document.getElementById('loadingText').style.display = 'none';
       })
@@ -299,11 +324,33 @@
     });
   }
 
+  function populateAreaFilter() {
+    const select = document.getElementById('filterArea');
+    const currentValue = select.value;
+    const areas = new Set();
+
+    Object.keys(groupedSites).forEach(no => {
+      const visits = groupedSites[no];
+      const latest = visits[visits.length - 1];
+      const addr = (latest.address || '').trim();
+      if (addr) areas.add(addr);
+    });
+
+    const sortedAreas = Array.from(areas).sort((a, b) => a.localeCompare(b));
+    select.innerHTML = '<option value="">គ្រប់តំបន់ (All Areas)</option>' +
+      sortedAreas.map(a => `<option value="${a}">${a}</option>`).join('');
+
+    if (sortedAreas.includes(currentValue)) {
+      select.value = currentValue;
+    }
+  }
+
   function renderExistingList() {
     const listContainer = document.getElementById('existingList');
     listContainer.innerHTML = '';
     
     const query = document.getElementById('searchExisting').value.toLowerCase().trim();
+    const areaFilter = document.getElementById('filterArea').value;
 
     Object.keys(groupedSites).forEach(no => {
       const visits = groupedSites[no];
@@ -314,6 +361,10 @@
       const addr = latest.address || 'គ្មានអាសយដ្ឋាន';
       
       if (query && !pName.toLowerCase().includes(query) && !String(no).includes(query) && !cPerson.toLowerCase().includes(query)) {
+        return;
+      }
+
+      if (areaFilter && (latest.address || '') !== areaFilter) {
         return;
       }
 
@@ -372,7 +423,7 @@
       const imgHtml = imgFormatted ? `<img class="visit-right-img" src="${imgFormatted}" onerror="this.onerror=null;this.src='https://via.placeholder.com/100x120?text=No+Img';">` : `<div class="visit-right-img" style="display:flex;align-items:center;justify-content:center;color:#888;font-size:11px;">គ្មានរូប</div>`;
 
       box.innerHTML = `
-        <div class="visit-title"><span>លើកទី ${idx + 1}</span>${v.visitTime ? `<span class="visit-time">🕒 ${v.visitTime}</span>` : ''}</div>
+        <div class="visit-title"><span>លើកទី ${idx + 1}</span>${v.visitTime ? `<span class="visit-time">🕒 ${formatVisitDateOnly(v.visitTime)}</span>` : ''}</div>
         <div class="visit-content">
           <div class="visit-details">
             <div class="detail-row"><span class="detail-label">ឈ្មោះគម្រោង:</span> ${v.projectName || '-'}</div>
