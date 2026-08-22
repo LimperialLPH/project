@@ -468,14 +468,8 @@
     document.getElementById('stage').value = latest.stage || '';
     document.getElementById('remark').value = latest.remark || '';
 
-    if (latest.siteImage) {
-      const formattedImg = formatGoogleDriveUrl(latest.siteImage);
-      document.getElementById('imagePreview').src = formattedImg;
-      document.getElementById('photoPreview').textContent = '✓ រូបថតចាស់ត្រូវបានប្រើប្រាស់';
-      document.getElementById('previewContainer').style.display = 'block';
-    } else {
-      resetPhotoInputs();
-    }
+    // Always start with a clean photo field for a new visit entry - don't carry over the old site photo
+    resetPhotoInputs();
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
