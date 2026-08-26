@@ -24,6 +24,58 @@
     input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; outline: none; }
     input:focus, select:focus, textarea:focus { border-color: #3498db; }
 
+    /* Custom Smooth Combobox Dropdown */
+    .combo-wrapper { position: relative; width: 100%; }
+    .combo-wrapper input { padding-right: 38px; width: 100%; }
+    .combo-btn {
+      position: absolute; right: 0; top: 0; bottom: 0; width: 38px;
+      display: flex; align-items: center; justify-content: center;
+      background: transparent; border: none; cursor: pointer;
+      color: #7f8c8d; font-size: 12px; transition: transform 0.2s, color 0.2s;
+    }
+    .combo-btn:hover { color: #3498db; }
+    .combo-btn.open { transform: rotate(180deg); }
+
+    .custom-dropdown-list {
+      display: none;
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      max-height: 220px;
+      overflow-y: auto;
+      background: #ffffff;
+      border: 1px solid #3498db;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+      z-index: 1000;
+      margin: 0;
+      padding: 4px 0;
+      list-style: none;
+    }
+    .custom-dropdown-list li {
+      padding: 9px 12px;
+      font-size: 14px;
+      color: #2c3e50;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .custom-dropdown-list li:hover {
+      background-color: #ebf5fb;
+      color: #2980b9;
+      font-weight: 600;
+    }
+    .custom-dropdown-list li.no-result {
+      color: #95a5a6;
+      font-style: italic;
+      cursor: default;
+    }
+    .custom-dropdown-list li.no-result:hover {
+      background-color: transparent;
+      color: #95a5a6;
+      font-weight: normal;
+    }
+
     .photo-btn {
       display: block; width: 100%; padding: 12px; border-radius: 8px; border: 1px dashed #3498db;
       background: #ebf5fb; text-align: center; cursor: pointer; font-size: 14px;
@@ -142,51 +194,14 @@
         <input type="text" id="projectName" required placeholder="បញ្ចូលឈ្មោះគម្រោង">
       </div>
 
-      <!-- Address / Area with Dropdown and Typable Input -->
+      <!-- Address / Area with Custom Smooth Dropdown -->
       <div class="form-group">
         <label for="address">អាសយដ្ឋាន/ខណ្ឌ/តំបន់ (Address / District / Area)</label>
-        <input list="addressOptions" type="text" id="address" placeholder="ជ្រើសរើស ឬវាយបញ្ចូលអាសយដ្ឋាន/ខណ្ឌ/ខេត្ត...">
-        <datalist id="addressOptions">
-          <option value="ដូនពេញ"></option>
-          <option value="ចំការមន"></option>
-          <option value="ប្រាំពីរមករា"></option>
-          <option value="ទួលគោក"></option>
-          <option value="បឹងកេងកង"></option>
-          <option value="កំបូល"></option>
-          <option value="សែនសុខ"></option>
-          <option value="ឫស្សីកែវ"></option>
-          <option value="ជ្រោយចង្វារ"></option>
-          <option value="មានជ័យ"></option>
-          <option value="ច្បារអំពៅ"></option>
-          <option value="ពោធិ៍សែនជ័យ"></option>
-          <option value="ដង្កោ"></option>
-          <option value="ព្រែកព្នៅ"></option>
-          <option value="តាខ្មៅ"></option>
-          <option value="ខេត្តបន្ទាយមានជ័យ"></option>
-          <option value="ខេត្តបាត់ដំបង"></option>
-          <option value="ខេត្តកំពង់ចាម"></option>
-          <option value="ខេត្តកំពង់ឆ្នាំង"></option>
-          <option value="ខេត្តកំពង់ស្ពឺ"></option>
-          <option value="ខេត្តកំពង់ធំ"></option>
-          <option value="ខេត្តកំពត"></option>
-          <option value="ខេត្តកណ្តាល"></option>
-          <option value="ខេត្តកោះកុង"></option>
-          <option value="ខេត្តក្រចេះ"></option>
-          <option value="ខេត្តមណ្ឌលគិរី"></option>
-          <option value="ខេត្តព្រះវិហារ"></option>
-          <option value="ខេត្តព្រៃវែង"></option>
-          <option value="ខេត្តពោធិ៍សាត់"></option>
-          <option value="ខេត្តរតនគិរី"></option>
-          <option value="ខេត្តសៀមរាប"></option>
-          <option value="ខេត្តព្រះសីហនុ"></option>
-          <option value="ខេត្តស្ទឹងត្រែង"></option>
-          <option value="ខេត្តស្វាយរៀង"></option>
-          <option value="ខេត្តតាកែវ"></option>
-          <option value="ខេត្តឧត្តរមានជ័យ"></option>
-          <option value="ខេត្តកែប"></option>
-          <option value="ខេត្តប៉ៃលិន"></option>
-          <option value="ខេត្តត្បូងឃ្មុំ"></option>
-        </datalist>
+        <div class="combo-wrapper" id="addressComboWrapper">
+          <input type="text" id="address" autocomplete="off" placeholder="ជ្រើសរើស ឬវាយបញ្ចូលអាសយដ្ឋាន/ខណ្ឌ/ខេត្ត..." oninput="handleAddressInput()" onfocus="openAddressDropdown()">
+          <button type="button" class="combo-btn" id="comboToggleBtn" onclick="toggleAddressDropdown()" title="Open List">▼</button>
+          <ul id="addressCustomDropdown" class="custom-dropdown-list"></ul>
+        </div>
       </div>
 
       <!-- Contact Person -->
@@ -307,9 +322,81 @@
   let groupedSites = {};
   let currentActiveSiteNo = null;
 
+  const ADDRESS_LIST = [
+    "ដូនពេញ", "ចំការមន", "ប្រាំពីរមករា", "ទួលគោក", "បឹងកេងកង",
+    "កំបូល", "សែនសុខ", "ឫស្សីកែវ", "ជ្រោយចង្វារ", "មានជ័យ",
+    "ច្បារអំពៅ", "ពោធិ៍សែនជ័យ", "ដង្កោ", "ព្រែកព្នៅ", "តាខ្មៅ",
+    "ខេត្តបន្ទាយមានជ័យ", "ខេត្តបាត់ដំបង", "ខេត្តកំពង់ចាម", "ខេត្តកំពង់ឆ្នាំង", "ខេត្តកំពង់ស្ពឺ",
+    "ខេត្តកំពង់ធំ", "ខេត្តកំពត", "ខេត្តកណ្តាល", "ខេត្តកោះកុង", "ខេត្តក្រចេះ",
+    "ខេត្តមណ្ឌលគិរី", "ខេត្តព្រះវិហារ", "ខេត្តព្រៃវែង", "ខេត្តពោធិ៍សាត់", "ខេត្តរតនគិរី",
+    "ខេត្តសៀមរាប", "ខេត្តព្រះសីហនុ", "ខេត្តស្ទឹងត្រែង", "ខេត្តស្វាយរៀង", "ខេត្តតាកែវ",
+    "ខេត្តឧត្តរមានជ័យ", "ខេត្តកែប", "ខេត្តប៉ៃលិន", "ខេត្តត្បូងឃ្មុំ"
+  ];
+
   window.onload = function() {
     loadExistingSitesData();
+    renderCustomDropdown(ADDRESS_LIST);
   };
+
+  function renderCustomDropdown(items) {
+    const dropdown = document.getElementById('addressCustomDropdown');
+    dropdown.innerHTML = '';
+    if (items.length === 0) {
+      const li = document.createElement('li');
+      li.className = 'no-result';
+      li.textContent = 'រកមិនឃើញតំបន់ដែលត្រូវគ្នា';
+      dropdown.appendChild(li);
+      return;
+    }
+    items.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = item;
+      li.onclick = function() {
+        document.getElementById('address').value = item;
+        closeAddressDropdown();
+      };
+      dropdown.appendChild(li);
+    });
+  }
+
+  function openAddressDropdown() {
+    const query = document.getElementById('address').value.trim().toLowerCase();
+    const filtered = ADDRESS_LIST.filter(item => item.toLowerCase().includes(query));
+    renderCustomDropdown(filtered);
+    document.getElementById('addressCustomDropdown').style.display = 'block';
+    document.getElementById('comboToggleBtn').classList.add('open');
+  }
+
+  function closeAddressDropdown() {
+    document.getElementById('addressCustomDropdown').style.display = 'none';
+    document.getElementById('comboToggleBtn').classList.remove('open');
+  }
+
+  function toggleAddressDropdown() {
+    const dropdown = document.getElementById('addressCustomDropdown');
+    if (dropdown.style.display === 'block') {
+      closeAddressDropdown();
+    } else {
+      document.getElementById('address').focus();
+      openAddressDropdown();
+    }
+  }
+
+  function handleAddressInput() {
+    const val = document.getElementById('address').value.trim().toLowerCase();
+    const filtered = ADDRESS_LIST.filter(item => item.toLowerCase().includes(val));
+    renderCustomDropdown(filtered);
+    document.getElementById('addressCustomDropdown').style.display = 'block';
+    document.getElementById('comboToggleBtn').classList.add('open');
+  }
+
+  // Close dropdown on outside click
+  document.addEventListener('click', function(e) {
+    const wrapper = document.getElementById('addressComboWrapper');
+    if (wrapper && !wrapper.contains(e.target)) {
+      closeAddressDropdown();
+    }
+  });
 
   function switchTab(tab) {
     document.getElementById('successNotice').style.display = 'none';
@@ -324,6 +411,7 @@
       document.getElementById('formHeaderTitle').textContent = 'បញ្ចូលការដ្ឋានថ្មី';
       document.getElementById('siteNo').value = '';
       document.getElementById('sourcingForm').reset();
+      closeAddressDropdown();
       resetPhotoInputs();
     } else {
       document.getElementById('tabExisting').classList.add('active');
@@ -352,22 +440,18 @@
     if (val === null || val === undefined || val === '') return null;
     let num = parseFloat(String(val).replace('%', '').trim());
     if (isNaN(num)) return null;
-    // Google Sheets exports percent-formatted cells as a decimal fraction (e.g. 0.5 instead of 50)
     if (num > 0 && num <= 1) num = num * 100;
     return Math.round(num);
   }
 
   function formatVisitDateOnly(visitTime) {
     if (!visitTime) return '';
-    // en-GB toLocaleString format: "DD/MM/YYYY, HH:MM:SS" -> take the date part before the comma
     if (visitTime.includes(',')) {
       return visitTime.split(',')[0].trim();
     }
-    // ISO datetime format: "YYYY-MM-DDTHH:MM:SS.sssZ" -> take the date part before the "T"
     if (visitTime.includes('T')) {
       return visitTime.split('T')[0];
     }
-    // Fallback: try parsing as a Date object
     const d = new Date(visitTime);
     if (!isNaN(d.getTime())) {
       return d.toLocaleDateString('en-GB', { timeZone: 'Asia/Phnom_Penh' });
@@ -377,7 +461,6 @@
 
   function formatGoogleDriveUrl(url) {
     if (!url) return '';
-    // If it's already a thumbnail format or non-drive link, return it directly
     if (url.includes('drive.google.com/thumbnail')) return url;
     
     let fileId = '';
@@ -564,9 +647,8 @@
     document.getElementById('stage').value = latest.stage || '';
     document.getElementById('remark').value = latest.remark || '';
 
-    // Always start with a clean photo field for a new visit entry
+    closeAddressDropdown();
     resetPhotoInputs();
-    
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
