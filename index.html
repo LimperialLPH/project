@@ -38,7 +38,7 @@
     .preview-container {
       display: none; margin-top: 10px; text-align: center; background: #f8f9fa; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;
     }
-    .preview-container img { max-width: 100%; max-height: 180px; border-radius: 6px; object-fit: cover; }
+    .preview-container img { max-width: 100%; max-height: 180px; border-radius: 6px; object-fit: cover; cursor: pointer; }
     .preview-text { font-size: 12px; color: #27ae60; margin-top: 4px; font-weight: 600; }
 
     /* Success Card */
@@ -50,7 +50,7 @@
     /* Existing Site Platform Styles */
     .site-card { display: flex; align-items: center; gap: 12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; margin-bottom: 10px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
     .site-card:hover { background-color: #f8fbfe; border-color: #3498db; }
-    .site-thumb { width: 65px; height: 65px; border-radius: 8px; object-fit: cover; background: #e2e8f0; flex-shrink: 0; }
+    .site-thumb { width: 65px; height: 65px; border-radius: 8px; object-fit: cover; background: #e2e8f0; flex-shrink: 0; cursor: pointer; }
     .site-info { display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; }
     .site-title { font-weight: 700; font-size: 14px; color: #1a5276; margin-bottom: 2px; }
     .site-sub { font-size: 12px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
@@ -73,10 +73,43 @@
     .detail-label { font-weight: 600; color: #2c3e50; }
     
     /* Image aligned top-right in visit box */
-    .visit-right-img { width: 100px; height: 120px; border-radius: 8px; object-fit: cover; border: 1px solid #d4e6f1; background: #e2e8f0; flex-shrink: 0; }
+    .visit-right-img { width: 100px; height: 120px; border-radius: 8px; object-fit: cover; border: 1px solid #d4e6f1; background: #e2e8f0; flex-shrink: 0; cursor: pointer; }
 
     /* Sticky Bottom Button for Existing Site Detail */
     .sticky-bottom-btn { position: sticky; bottom: 0; background: #ffffff; padding: 10px 0 0 0; border-top: 1px solid #eee; margin-top: 15px; }
+
+    /* Photo Lightbox / Modal Preview */
+    .image-modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+    }
+    .image-modal img {
+      max-width: 95%;
+      max-height: 90vh;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      object-fit: contain;
+    }
+    .image-modal-close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      color: #ffffff;
+      font-size: 32px;
+      font-weight: bold;
+      cursor: pointer;
+      user-select: none;
+    }
   </style>
 </head>
 <body>
@@ -109,10 +142,51 @@
         <input type="text" id="projectName" required placeholder="បញ្ចូលឈ្មោះគម្រោង">
       </div>
 
-      <!-- Address / Area -->
+      <!-- Address / Area with Dropdown and Typable Input -->
       <div class="form-group">
         <label for="address">អាសយដ្ឋាន/ខណ្ឌ/តំបន់ (Address / District / Area)</label>
-        <input type="text" id="address" placeholder="ឧទាហរណ៍៖ ខណ្ឌទួលគោក, ភ្នំពេញ">
+        <input list="addressOptions" type="text" id="address" placeholder="ជ្រើសរើស ឬវាយបញ្ចូលអាសយដ្ឋាន/ខណ្ឌ/ខេត្ត...">
+        <datalist id="addressOptions">
+          <option value="ដូនពេញ"></option>
+          <option value="ចំការមន"></option>
+          <option value="ប្រាំពីរមករា"></option>
+          <option value="ទួលគោក"></option>
+          <option value="បឹងកេងកង"></option>
+          <option value="កំបូល"></option>
+          <option value="សែនសុខ"></option>
+          <option value="ឫស្សីកែវ"></option>
+          <option value="ជ្រោយចង្វារ"></option>
+          <option value="មានជ័យ"></option>
+          <option value="ច្បារអំពៅ"></option>
+          <option value="ពោធិ៍សែនជ័យ"></option>
+          <option value="ដង្កោ"></option>
+          <option value="ព្រែកព្នៅ"></option>
+          <option value="តាខ្មៅ"></option>
+          <option value="ខេត្តបន្ទាយមានជ័យ"></option>
+          <option value="ខេត្តបាត់ដំបង"></option>
+          <option value="ខេត្តកំពង់ចាម"></option>
+          <option value="ខេត្តកំពង់ឆ្នាំង"></option>
+          <option value="ខេត្តកំពង់ស្ពឺ"></option>
+          <option value="ខេត្តកំពង់ធំ"></option>
+          <option value="ខេត្តកំពត"></option>
+          <option value="ខេត្តកណ្តាល"></option>
+          <option value="ខេត្តកោះកុង"></option>
+          <option value="ខេត្តក្រចេះ"></option>
+          <option value="ខេត្តមណ្ឌលគិរី"></option>
+          <option value="ខេត្តព្រះវិហារ"></option>
+          <option value="ខេត្តព្រៃវែង"></option>
+          <option value="ខេត្តពោធិ៍សាត់"></option>
+          <option value="ខេត្តរតនគិរី"></option>
+          <option value="ខេត្តសៀមរាប"></option>
+          <option value="ខេត្តព្រះសីហនុ"></option>
+          <option value="ខេត្តស្ទឹងត្រែង"></option>
+          <option value="ខេត្តស្វាយរៀង"></option>
+          <option value="ខេត្តតាកែវ"></option>
+          <option value="ខេត្តឧត្តរមានជ័យ"></option>
+          <option value="ខេត្តកែប"></option>
+          <option value="ខេត្តប៉ៃលិន"></option>
+          <option value="ខេត្តត្បូងឃ្មុំ"></option>
+        </datalist>
       </div>
 
       <!-- Contact Person -->
@@ -176,7 +250,7 @@
           <input type="file" id="fileUpload" accept="image/*" onchange="handleFileSelected()">
         </label>
         <div id="previewContainer" class="preview-container">
-          <img id="imagePreview" src="#" alt="Selected Photo Preview">
+          <img id="imagePreview" src="#" alt="Selected Photo Preview" onclick="showImageModal(this.src)">
           <div id="photoPreview" class="preview-text">✓ រូបថតត្រូវបានជ្រើសរើស (Photo Selected)</div>
         </div>
       </div>
@@ -220,6 +294,12 @@
   </div>
 </div>
 
+<!-- Image Lightbox Modal for Photo Preview -->
+<div id="imageModal" class="image-modal" onclick="closeImageModal()">
+  <span class="image-modal-close" onclick="closeImageModal()">&times;</span>
+  <img id="modalImg" src="" alt="Preview" onclick="event.stopPropagation()">
+</div>
+
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLc7ezpsK4kPxBBWKknonrGRedXKw4JNhrBkRAqYysSk7EEfB-5ssRFI5eyqMXice0/exec"; 
   let selectedFile = null;
@@ -252,6 +332,20 @@
       document.getElementById('existingContainer').style.display = 'block';
       loadExistingSitesData();
     }
+  }
+
+  function showImageModal(src) {
+    if (!src || src === '#' || src.includes('via.placeholder.com')) return;
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImg');
+    modalImg.src = src;
+    modal.style.display = 'flex';
+  }
+
+  function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    modal.style.display = 'none';
+    document.getElementById('modalImg').src = '';
   }
 
   function normalizeSiteStatus(val) {
@@ -375,7 +469,7 @@
       card.className = 'site-card';
       card.onclick = () => openSiteDetail(no);
       card.innerHTML = `
-        <img class="site-thumb" src="${imgUrl}" onerror="this.onerror=null;this.src='https://via.placeholder.com/65?text=No+Img';">
+        <img class="site-thumb" src="${imgUrl}" onerror="this.onerror=null;this.src='https://via.placeholder.com/65?text=No+Img';" onclick="event.stopPropagation(); showImageModal('${imgUrl}')">
         <div class="site-info">
           <span class="site-title">No. ${no} - ${pName}</span>
           <span class="site-sub">👤 ${cPerson}</span>
@@ -420,7 +514,9 @@
       box.className = 'visit-box';
       
       const imgFormatted = formatGoogleDriveUrl(v.siteImage);
-      const imgHtml = imgFormatted ? `<img class="visit-right-img" src="${imgFormatted}" onerror="this.onerror=null;this.src='https://via.placeholder.com/100x120?text=No+Img';">` : `<div class="visit-right-img" style="display:flex;align-items:center;justify-content:center;color:#888;font-size:11px;">គ្មានរូប</div>`;
+      const imgHtml = imgFormatted 
+        ? `<img class="visit-right-img" src="${imgFormatted}" onerror="this.onerror=null;this.src='https://via.placeholder.com/100x120?text=No+Img';" onclick="showImageModal('${imgFormatted}')">` 
+        : `<div class="visit-right-img" style="display:flex;align-items:center;justify-content:center;color:#888;font-size:11px;">គ្មានរូប</div>`;
 
       box.innerHTML = `
         <div class="visit-title"><span>លើកទី ${idx + 1}</span>${v.visitTime ? `<span class="visit-time">🕒 ${formatVisitDateOnly(v.visitTime)}</span>` : ''}</div>
@@ -468,7 +564,7 @@
     document.getElementById('stage').value = latest.stage || '';
     document.getElementById('remark').value = latest.remark || '';
 
-    // Always start with a clean photo field for a new visit entry - don't carry over the old site photo
+    // Always start with a clean photo field for a new visit entry
     resetPhotoInputs();
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
