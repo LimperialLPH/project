@@ -294,13 +294,17 @@
 
   <!-- PLATFORM 2: Existing Sites List View -->
   <div id="existingContainer" style="display: none;">
-    <h2>ការដ្ឋានមានស្រាប់<!-- ADDED: Small Refresh Button -->
-    <button
-      type="button"
-      onclick="loadExistingSitesData()"
-      style="display:block; margin:-10px auto 12px; padding:5px 10px; border:1px solid #3498db; background:#ebf5fb; color:#2980b9; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;"
-      title="Refresh Data"
-    >↻ Refresh</button></h2> 
+   <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px;">
+  <h2 style="margin: 0;">ការដ្ឋានមានស្រាប់</h2>
+  <button
+    type="button"
+    onclick="loadExistingSitesData()"
+    style="padding: 5px 10px; border: 1px solid #3498db; background: #ebf5fb; color: #2980b9; border-radius: 6px; font-size: 12px; cursor: pointer;"
+    title="Refresh Data"
+  >
+    ↻ Refresh
+  </button>
+</div>
 
     <div class="search-filter-row">
       <input type="text" id="searchExisting" placeholder="🔍 វាយស្វែងរកឈ្មោះ ឬលេខ No..." oninput="filterExistingSites()">
