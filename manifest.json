@@ -1,6 +1,6 @@
 {
-  "name": "Employee Attendance Dashboard",
-  "short_name": "Attendance",
+  "name": "Project Database",
+  "short_name": "Project",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
